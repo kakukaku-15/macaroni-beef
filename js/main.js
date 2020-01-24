@@ -4,9 +4,6 @@ const app = new PIXI.Application();
 // bodyにpixi.jsのview(ステージ)を追加する
 document.body.appendChild(app.view);
 
-// Set the game state
-let state = play;
-
 // jump
 let jumpflag = 0;    // ジャンプ中は1
 const jump_speed = [];
@@ -14,17 +11,37 @@ for (i = 0; i <= 40; i++) {
     jump_speed[i] = 10 - (0.5 * i);    // ジャンプスピードの計算
 }
 
+// Set the game state
+let state = play;
+let score = 0
+let skill_point = 0
+let scoreText = new PIXI.Text("SCORE: 0", {font: "24px/1.2 vt", fill: "red"});
+scoreText.position.set(20, 20);
+app.stage.addChild(scoreText);
+
 const player_image = PIXI.Texture.from('img/bunny.png');
 const macaroni_image = PIXI.Texture.from('img/pasta_macaroni.png');
+const beef_image = PIXI.Texture.from('img/niku_gyu.png');
+const skill_image = PIXI.Texture.from('img/seiza02_oushi.png');
+const beem_image = PIXI.Texture.from('img/animal_bull_kowai.png');
 
 const player = new PIXI.Sprite(player_image);
-const macaroni = new PIXI.Sprite(macaroni_image);
+player.name = "player"
+const skill = new PIXI.Sprite(skill_image);
+const beem = new PIXI.Sprite(beem_image);
+beem.name = "beem"
 
 // グラフィックオブジェクトの作成
 const square = new PIXI.Graphics();
 player.position.set(100, 500)
 player.vx = 0;
 player.vy = 0;
+
+skill.scale.set(0.1)
+skill.position.set(750, 50)
+skill.anchor.set(0.5)
+skill.visible = false
+
 // グラフィックオブジェクトの設定
 square.width = 100;     // 横幅の設定
 square.height = 100;    // 縦幅の設定
@@ -35,18 +52,38 @@ square.beginFill(0x006400);    // 指定の色で塗りつぶし開始準備
 square.drawRect(0,0,1000,100);  // 矩形を描写する
 square.endFill();              // 塗りつぶしを完了する
 
-macaroni.position.set(100, 300)
-macaroni.scale.set(0.1)
-
 let items = new PIXI.Container();
+
+for(let i = 0; i < 100; i++) {
+    let num = Math.floor(Math.random() * 10);
+    let beef = Math.floor(Math.random() * 9);
+    x = 90 + 40*i
+    y = 400 + num*10
+    if(beef == 1) {
+        const beef = new PIXI.Sprite(beef_image);
+        beef.scale.set(0.08)
+        beef.position.set(x, y)
+        beef.anchor.set(0.5)
+        beef.name = "beef"
+        items.addChild(beef)
+        continue
+    }
+    const macaroni = new PIXI.Sprite(macaroni_image);
+    macaroni.scale.set(0.1)
+    macaroni.position.set(x, y)
+    macaroni.anchor.set(0.5)
+    macaroni.name = "macaroni"
+    items.addChild(macaroni)
+}
+
 let ground = new PIXI.Container();
 
-items.addChild(macaroni)
 ground.addChild(square)
 
 app.stage.addChild(player);
 app.stage.addChild(items);
 app.stage.addChild(ground);
+app.stage.addChild(skill);
 
 const keyboard = keyCode => {
     var key = {};
@@ -85,18 +122,19 @@ const keyboard = keyCode => {
     return key;
 }
 
-//Capture the keyboard arrow keys
+// Capture the keyboard arrow keys
 let space = keyboard(32),
     ctrl = keyboard(17);
+
 space.press = () => {
-    //console.log("up!");
     jump(player, jumpflag);
-    //player.vy = -5;
     player.vx = 0;
 };
 
 ctrl.press = () => {
-    items.x -= 1;
+    if(skill_point > 0) {
+        do_beem();
+    }
 }
 
 space.release = () => {
@@ -107,7 +145,14 @@ const animate = () => {
     requestAnimationFrame(animate); // 次の描画タイミングでanimateを呼び出す
     player.y += player.vy
     app.render(app.stage);   // 描画する
-    collision(player, macaroni);
+    items.x -= 1
+    if(skill_point > 0) {
+        skill.visible = true
+    }
+    items.children.forEach(item => {
+        collision(player, item);
+        scoreText.text = "SCORE: " + score;
+    })
 }
 
 requestAnimationFrame( animate );
@@ -120,15 +165,20 @@ function play(delta) {
 }
 
 function collision(player, item) {
-    // console.log(player.y, item.y)
-    if(player.y === item.y) {
+    if(player.y <= (items.toGlobal(item).y) && (player.y + player.height) >= (items.toGlobal(item).y) &&
+       player.x <= (items.toGlobal(item).x) && (player.x + player.width) >= (items.toGlobal(item).x)) {
         console.log("hit");
+        console.log(player.x, items.toGlobal(item).x, player.y, items.toGlobal(item).y)
+        items.removeChild(item)
+        score += 1 // ポイントを追加
+        if(item.name == "beef" && player.name == "player") {
+            skill_point += 1
+        }
     }
 }
 
 function jump(player) {
     if (jumpflag == 0) {
-        console.log("jump!");
         jumpflag = 1 ;
         var count = 0;
         var id = setInterval(function() {
@@ -138,5 +188,27 @@ function jump(player) {
                 jumpflag = 0; 
             }
         }, 50);
+    }
+}
+
+function do_beem() {
+    skill_point--;
+    skill.visible = false
+    beem.scale.set(0.2)
+    beem.position.set(player.x, player.y)
+    beem.anchor.set(0.5)
+    app.stage.addChild(beem);
+    requestAnimationFrame(beem_motion)
+}
+
+const beem_motion = () => {
+    requestAnimationFrame(beem_motion);
+    app.render(app.stage);
+    beem.x += 5
+    items.children.forEach(item => {
+        collision(beem, item)
+    })
+    if(beem.x >= 1000) {
+        app.stage.removeChild(beem);
     }
 }
