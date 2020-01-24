@@ -27,6 +27,7 @@ const beem_image = PIXI.Texture.from('img/animal_bull_kowai.png');
 
 const player = new PIXI.Sprite(player_image);
 player.name = "player"
+player.scale.set(0.1)
 const skill = new PIXI.Sprite(skill_image);
 const beem = new PIXI.Sprite(beem_image);
 beem.name = "beem"
