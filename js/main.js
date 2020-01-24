@@ -176,6 +176,9 @@ function collision(player, item) {
             skill_point += 1
         }
     }
+    if(items.toGlobal(items.children[0]).x < 0) {
+        items.removeChild(items.children[0])
+    }
 }
 
 function jump(player) {
