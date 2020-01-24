@@ -34,7 +34,7 @@ beem.name = "beem"
 
 // グラフィックオブジェクトの作成
 const square = new PIXI.Graphics();
-player.position.set(100, 500)
+player.position.set(10, 440)
 player.vx = 0;
 player.vy = 0;
 
