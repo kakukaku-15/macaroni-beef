@@ -47,7 +47,7 @@ skill.visible = false
 square.width = 100;     // 横幅の設定
 square.height = 100;    // 縦幅の設定
 square.x = 0;
-square.y =  550;
+square.y =  518;
 // グラフィックオブジェクトの塗りつぶし設定
 square.beginFill(0x006400);    // 指定の色で塗りつぶし開始準備
 square.drawRect(0,0,1000,100);  // 矩形を描写する
