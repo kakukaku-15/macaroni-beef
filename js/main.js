@@ -145,7 +145,7 @@ const animate = () => {
     requestAnimationFrame(animate); // 次の描画タイミングでanimateを呼び出す
     player.y += player.vy
     app.render(app.stage);   // 描画する
-    items.x -= 1
+    items.x -= 2
     if(skill_point > 0) {
         skill.visible = true
     }
@@ -187,7 +187,7 @@ function jump(player) {
                 clearInterval(id);
                 jumpflag = 0; 
             }
-        }, 50);
+        }, 40);
     }
 }
 
