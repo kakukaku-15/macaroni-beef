@@ -205,11 +205,13 @@ function do_beem() {
 const beem_motion = () => {
     requestAnimationFrame(beem_motion);
     app.render(app.stage);
-    beem.x += 5
+    beem.x += 4.8
+    if(beem.x >= 700) {
+        app.stage.removeChild(beem);
+        return
+    }
     items.children.forEach(item => {
         collision(beem, item)
     })
-    if(beem.x >= 1000) {
-        app.stage.removeChild(beem);
-    }
+    shower_item()
 }
