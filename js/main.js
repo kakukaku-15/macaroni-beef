@@ -4,6 +4,19 @@ const app = new PIXI.Application();
 // bodyにpixi.jsのview(ステージ)を追加する
 document.body.appendChild(app.view);
 
+// bgm
+let audio_bgm = new Audio('sound/guutara.mp3');
+audio_bgm.volume = 0.5;
+audio_bgm.loop = 'true';
+audio_bgm.load();
+audio_bgm.play();
+
+// sound effects
+let audio_jump = new Audio('sound/jump12.mp3');    // ジャンプ音
+let audio_cow = new Audio('sound/holstein-cow-mooing-1.mp3');    // 牛
+let audio_getmacaroni = new Audio('sound/poka03.mp3');
+let audio_getbeef = new Audio('sound/powerup10.mp3');
+
 // jump
 let jumpflag = 0;    // ジャンプ中は1
 const jump_speed = [];
@@ -173,6 +186,11 @@ function collision(player, item) {
         score += 1 // ポイントを追加
         if(item.name == "beef" && player.name == "player") {
             skill_point += 1
+            audio_getbeef.currentTime = 0.05;
+            audio_getbeef.play();
+        } else {
+            audio_getmacaroni.currentTime = 0.05;
+            audio_getmacaroni.play();
         }
     }
 }
@@ -180,6 +198,7 @@ function collision(player, item) {
 function jump(player) {
     if (jumpflag == 0) {
         jumpflag = 1 ;
+        audio_jump.play();
         var count = 0;
         var id = setInterval(function() {
             player.y -= jump_speed[count];
@@ -192,6 +211,7 @@ function jump(player) {
 }
 
 function do_beem() {
+    audio_cow.play();
     skill_point--;
     skill.visible = false
     beem.scale.set(0.2)
