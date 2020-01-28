@@ -198,9 +198,8 @@ function jump(player) {
 function do_beem() {
     skill_point--;
     skill.visible = false
-    beem.scale.set(0.2)
+    beem.scale.set(0.15)
     beem.position.set(player.x, player.y)
-    beem.anchor.set(0.5)
     app.stage.addChild(beem);
     requestAnimationFrame(beem_motion)
 }
